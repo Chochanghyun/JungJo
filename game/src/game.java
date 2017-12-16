@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -18,28 +19,40 @@ public class game {
 }
 
 class Shooting_Frame extends Frame implements Runnable, KeyListener {
-	Image stdimg = new ImageIcon("ÇÐ»ý.png").getImage();
-	Image background = new ImageIcon("°­ÀÇ½Ç.png").getImage();
+	boolean keyUp = false; // ìœ„ìª½ í™”ì‚´í‘œê°€ ëˆŒëŸ¬ì§€ì§€ì•Šì€ì±„ë¡œìžˆë‹¤.
+	boolean keyDown = false;// ì•„ëž˜ìª½ í™”ì‚´í‘œê°€ ëˆŒëŸ¬ì§€ì§€ì•Šì€ì±„ë¡œìžˆë‹¤.
+	boolean keyLeft = false;// ì™¼ìª½ í™”ì‚´í‘œê°€ ëˆŒëŸ¬ì§€ì§€ì•Šì€ì±„ë¡œìžˆë‹¤.
+	boolean keyRight = false;// ì˜¤ë¥¸ìª½ í™”ì‚´í‘œê°€ ëˆŒëŸ¬ì§€ì§€ì•Šì€ì±„ë¡œìžˆë‹¤.
+	boolean space = false;
+	boolean shift = false;
+	boolean p = false;
+	boolean et = false;
+	boolean r = false;
 	
-	Graphics gc; // ¿ÀºêÁ§Æ®µéÀ» ±×¸®±â À§ÇÑ ±×·¡ÇÈ ÅøÀ» Á¤ÀÇÇÑ´Ù
+	Image stdimg = new ImageIcon("í•™ìƒ.png").getImage();
+	Image background = new ImageIcon("ê°•ì˜ì‹¤.png").getImage();
+	Image level1 = new ImageIcon("ì´ˆê¸‰.jpg").getImage();
+	Image level2 = new ImageIcon("ì¤‘ê¸‰.png").getImage();
+	Image level3 = new ImageIcon("ê³ ê¸‰.jpg").getImage();
+	Image buffimg = null; // ë”ë¸”ë²„í¼ë§ì„ ì‚¬ìš©í•˜ê¸°ìœ„í•œ ë²„í¼ì´ë¯¸ì§€ë¥¼ ì •ì˜í•œë‹¤
+	Graphics gc; // ì˜¤ë¸Œì íŠ¸ë“¤ì„ ê·¸ë¦¬ê¸° ìœ„í•œ ê·¸ëž˜í”½ íˆ´ì„ ì •ì˜í•œë‹¤
 	
-	int x = 400, y = 300; // Ä³¸¯ÅÍÀÇ ½ÃÀÛ À§Ä¡, ±×¸®°í ¾ÕÀ¸·ÎÀÇ ÁÂÇ¥¸¦ ¹Þ¾Æ¿À±â À§ÇÑ º¯¼ö
-	
+	int x = 400, y = 300; // ìºë¦­í„°ì˜ ì‹œìž‘ ìœ„ì¹˜, ê·¸ë¦¬ê³  ì•žìœ¼ë¡œì˜ ì¢Œí‘œë¥¼ ë°›ì•„ì˜¤ê¸° ìœ„í•œ ë³€ìˆ˜
+	int cnt = 0; // ì“°ë ˆë“œì˜ ë£¨í”„ë¥¼ ì„¸ëŠ” ë³€ìˆ˜, ê°ì¢… ë³€ìˆ˜ë¥¼ í†µì œí•˜ê¸° ìœ„í•´ ì‚¬ìš©ëœë‹¤
 	int mode = 0;
 	int selectmode = 1;
-	Image level1 = new ImageIcon("ÃÊ±Þ.jpg").getImage();
-	Image level2 = new ImageIcon("Áß±Þ.png").getImage();
-	Image level3 = new ImageIcon("°í±Þ.jpg").getImage();
-	Image buffimg = null; // ´õºí¹öÆÛ¸µÀ» »ç¿ëÇÏ±âÀ§ÇÑ ¹öÆÛÀÌ¹ÌÁö¸¦ Á¤ÀÇÇÑ´Ù
+	int life = 0; // ëª©ìˆ¨
+	boolean pause = false;
+	boolean ghost = false;
 	
 	Shooting_Frame() {
 		setTitle("A+ or F");
 		setSize(800, 600);
-		start(); // ¾²·¹µåÀÇ ·çÇÁ¸¦ ½ÃÀÛÇÏ±â À§ÇÑ ¸Þ½áµå
+		start(); // ì“°ë ˆë“œì˜ ë£¨í”„ë¥¼ ì‹œìž‘í•˜ê¸° ìœ„í•œ ë©”ì¨ë“œ
 		setLocation(250, 80);
-		setResizable(false); // »çÀÌÁî¸¦ Á¶ÀýÇÒ ¼ö ¾ø°Ô ¸¸µë
-		setVisible(true); // ÇÁ·¹ÀÓÀ» º¸ÀÌ°Ô ¸¸µë
-		this.addKeyListener(this); // Å°¸®½º³Ê¸¦ Ãß°¡ÇÏ¿© ¹æÇâÅ° Á¤º¸¸¦ ¹Þ¾Æ¿Ã ¼ö ÀÖ°Ô ÇÑ´Ù.
+		setResizable(false); // ì‚¬ì´ì¦ˆë¥¼ ì¡°ì ˆí•  ìˆ˜ ì—†ê²Œ ë§Œë“¬
+		setVisible(true); // í”„ë ˆìž„ì„ ë³´ì´ê²Œ ë§Œë“¬
+		this.addKeyListener(this); // í‚¤ë¦¬ìŠ¤ë„ˆë¥¼ ì¶”ê°€í•˜ì—¬ ë°©í–¥í‚¤ ì •ë³´ë¥¼ ë°›ì•„ì˜¬ ìˆ˜ ìžˆê²Œ í•œë‹¤.
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -50,30 +63,66 @@ class Shooting_Frame extends Frame implements Runnable, KeyListener {
 	}
 	public void update(Graphics g) {
 		paint(g);
-	} // ÇÁ·¹ÀÓ ³»ÀÇ ¹öÆÛÀÌ¹ÌÁö¸¦ ÀÌ¿ëÇÏ¿© ±ôºýÀÓ Çö»óÀ» ¿ÏÀüÈ÷ ¾ø¾Û´Ï´Ù.
+	} // í”„ë ˆìž„ ë‚´ì˜ ë²„í¼ì´ë¯¸ì§€ë¥¼ ì´ìš©í•˜ì—¬ ê¹œë¹¡ìž„ í˜„ìƒì„ ì™„ì „ížˆ ì—†ì•±ë‹ˆë‹¤.
 
-	public void paint(Graphics g) { // °¢Á¾ ÀÌ¹ÌÁö¸¦ ±×¸®±âÀ§ÇÑ¸Þ¼­µå¸¦ ½ÇÇà½ÃÅ²´Ù
-		buffimg = createImage(800, 600); // ¹öÆÛÀÌ¹ÌÁö¸¦ ±×¸°´Ù (¶°ºí¹öÆÛ¸µÀ» »ç¿ëÇÏ¿© È­¸éÀÇ ±ôºýÀÓÀ»
-											// ¾ø¾Ø´Ù)
-		gc = buffimg.getGraphics(); // ¹öÆÛÀÌ¹ÌÁö¿¡ ´ëÇÑ ±×·¡ÇÈ °´Ã¤¸¦ ¾ò¾î¿Â´Ù.
+	public void paint(Graphics g) { // ê°ì¢… ì´ë¯¸ì§€ë¥¼ ê·¸ë¦¬ê¸°ìœ„í•œë©”ì„œë“œë¥¼ ì‹¤í–‰ì‹œí‚¨ë‹¤
+		buffimg = createImage(800, 600); // ë²„í¼ì´ë¯¸ì§€ë¥¼ ê·¸ë¦°ë‹¤ (ë– ë¸”ë²„í¼ë§ì„ ì‚¬ìš©í•˜ì—¬ í™”ë©´ì˜ ê¹œë¹¡ìž„ì„
+											// ì—†ì•¤ë‹¤)
+		gc = buffimg.getGraphics(); // ë²„í¼ì´ë¯¸ì§€ì— ëŒ€í•œ ê·¸ëž˜í”½ ê°ì±„ë¥¼ ì–»ì–´ì˜¨ë‹¤.
 		drawimages(g);
 	}
 	
 	public void start() {
-		Thread th = new Thread(this); // ¾²·¹µå ¸¦ Á¤ÀÇ
-		th.start(); // ¾²·¹µåÀÇ ·çÇÁ¸¦ ½ÃÀÛ½ÃÅ²´Ù
+		Thread th = new Thread(this); // ì“°ë ˆë“œ ë¥¼ ì •ì˜
+		th.start(); // ì“°ë ˆë“œì˜ ë£¨í”„ë¥¼ ì‹œìž‘ì‹œí‚¨ë‹¤
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			keyLeft = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			keyRight = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
+			keyUp = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			keyDown = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			if (mode != 3) {
+				space = true;
+			} //ê³ ê¸‰ëª¨ë“œì—ì„œëŠ” ë¶€ìŠ¤í„°ê°€ ì‚¬ìš©ë˜ì§€ì•Šìœ¼ë¯€ë¡œ
+		} else if (e.getKeyCode() == KeyEvent.VK_P) {
+			p = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_R) {
+			r = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			et = true;
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			keyLeft = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			keyRight = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
+			keyUp = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			keyDown = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			space = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+			shift = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_P) {
+			p = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_R) {
+			r = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			et = false;
+		}
 	}
 
 	@Override
@@ -85,20 +134,95 @@ class Shooting_Frame extends Frame implements Runnable, KeyListener {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+		while(true) {
+			try {
+				arrowkey(); // ë°›ì€ í‚¤ì— ë”°ë¥¸ ìºë¦­í„°ì˜ ì´ë™ì„ í†µì œ
+				repaint(); // ë¦¬íŽ˜ì¸íŠ¸í•¨ìˆ˜(ê·¸ë¦¼ì„ ê·¸ë•Œê·¸ë•Œ ìƒˆë¡œê¸°ë¦¬ê¸°ìœ„í•¨)
+				Thread.sleep(20);
+				} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // 20ë°€ë¦¬ì„¸ì»¨ë“œë‹¹ í•œë²ˆì˜ ë£¨í”„ê°€ ëŒì•„ê°„ë‹¤
+		}
 	}
 	
 	public void drawimages(Graphics g) {
-			backgroundDrawImg(); // ¹è°æÀÇ ±×¸²À» ±×¸°´Ù
-			g.drawImage(buffimg, 0, 0, this); // ¹öÆÛÀÌ¹ÌÁö¸¦ ±×¸°´Ù. 0,0À¸·Î ÁÂÇ¥¸¦ ¸ÂÃç¼­ÇÁ·¹ÀÓÅ©±â¿¡
-												// µü¸ÂÃá´Ù
+		if (mode == 0) {
+			setBackground(Color.BLACK);
+			if (selectmode == 1) {
+				gc.drawImage(level1, 0,10, this);
+			} else if (selectmode == 2) {
+				gc.drawImage(level2, 0, 10, this);
+			} else if (selectmode == 3) {
+				gc.drawImage(level3, 0, 10, this);
+			}
+			g.drawImage(buffimg, 0, 0, this);
+		} // ê²Œìž„ ë‚œì´ë„ì— ë”°ë¼ì„œ ì´ë¯¸ì§€ë¥¼ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤.
 	}
 	
 	public void backgroundDrawImg() {
-		gc.drawImage(background, 0, 0, this); // °¡Á®¿Â ¹è°æÀÌ¹ÌÁöÆÄÀÏÀ» 0,0¿¡ À§Ä¡½ÃÅ²´Ù
+		gc.drawImage(background, 0, 0, this); // ê°€ì ¸ì˜¨ ë°°ê²½ì´ë¯¸ì§€íŒŒì¼ì„ 0,0ì— ìœ„ì¹˜ì‹œí‚¨ë‹¤
 	}
 	
-	
+	public void arrowkey() { // ìºë¦­í„°ì˜ ì´ë™ì†ë„ì™€ ë°©í–¥í‚¤ì— ë”°ë¥¸ ì´ë™ë°©í–¥ì„ ê²°ì •í•˜ê³ , ìºë¦­í„°ë¥¼ í™”ë©´
+		// ë°–ìœ¼ë¡œëª»ë¹ ì ¸ë‚˜ê°€ê°€ê²Œí•©ë‹ˆë‹¤. ê·¸ë¦¬ê³  ë¶€ìŠ¤í„° ë˜í•œ í†µì œí•©ë‹ˆë‹¤
+		if (mode == 0) {
+			if (keyLeft == true) {
+				selectmode--;
+				if (selectmode == 0) {
+					selectmode = 3;
+				}
+				keyLeft = false;
+			}
+			if (keyRight == true) {
+				selectmode++;
+				if (selectmode == 4) {
+					selectmode = 1;
+				}
+				keyRight = false;
+			}
+		} else {
+			if (keyUp == true && pause == false) {
+				if (y > 0) {
+					if (space == false) {
+						y -= 8;
+					} else {
+						y -= 15;
+					}
+				}
+			}
+			if (keyDown == true && pause == false) {
+				if (y < 570) {
+					if (space == false) {
+						y += 8;
+					} else {
+						y += 15;
+					}
+				}
+			}
+			if (keyLeft == true && pause == false) {
+				if (x > 0) {
+					if (space == false) {
+						x -= 8;
+					} else {
+						x -= 15;
+					}
+				}
+			}
+			if (keyRight == true && pause == false) {
+				if (x < 780) {
+					if (space == false) {
+						x += 8;
+					} else {
+						x += 15;
+					}
+				}
+			}
+			if (et == true) {
+				mode = selectmode;
+			}
+		}
+	}
 	
 }
 
