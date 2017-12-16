@@ -138,6 +138,7 @@ class Shooting_Frame extends Frame implements Runnable, KeyListener {
 			try {
 				arrowkey(); // 받은 키에 따른 캐릭터의 이동을 통제
 				repaint(); // 리페인트함수(그림을 그때그때 새로기리기위함)
+				modeandpause();
 				Thread.sleep(20);
 				} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -158,6 +159,11 @@ class Shooting_Frame extends Frame implements Runnable, KeyListener {
 			}
 			g.drawImage(buffimg, 0, 0, this);
 		} // 게임 난이도에 따라서 이미지를 나타냅니다.
+		if (mode != 0) {
+			backgroundDrawImg(); // 배경의 그림을 그린다
+			g.drawImage(buffimg, 0, 0, this); // 버퍼이미지를 그린다. 0,0으로 좌표를 맞춰서프레임크기에
+												// 딱맞춘다
+		}
 	}
 	
 	public void backgroundDrawImg() {
@@ -221,6 +227,25 @@ class Shooting_Frame extends Frame implements Runnable, KeyListener {
 			if (et == true) {
 				mode = selectmode;
 			}
+		}
+	}
+	
+	public void modeandpause() {
+		if (mode == 0) {
+			if (et == true) {
+				mode = selectmode; //엔터를 누르면 해당모드를 적용시킨 후 게임이 시작됩니다
+			}
+			if (mode == 1) { // 초급에서 사용되는 아이템들입니다.
+				
+			} else if (mode == 2) {
+				
+			} else if (mode == 3) {
+				
+			}
+		}
+		if (p == true) { // p를 누르면 게임이 멈춥니다
+			pause = !pause;
+			p = false;
 		}
 	}
 	
